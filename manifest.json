@@ -3,12 +3,18 @@
   "name": "eBae",
   "description": "eBae",
   "version": "0.0.0.1",
-  "permissions": ["contextMenus", "tabs", "activeTab"],
+  "permissions": ["contextMenus", "tabs", "activeTab", "<all_urls>"],
   "web_accessible_resources": ["images/*", "images/image.png", "image.png"],
   "background": {
-    "scripts": ["event.js", "background.js"],
+    "scripts": ["event.js", "thirdparty/jquery-3.4.1.js", "background.js" ],
     "persistent": true
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*","https://*/*"],
+      "js": ["thirdparty/jquery-3.4.1.js"]
+    }
+  ],
   "browser_action": {
     "default_title": "eBae",
     "default_popup": "popup.html"

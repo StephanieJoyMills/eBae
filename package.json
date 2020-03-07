@@ -13,6 +13,7 @@
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
+    "jquery": "^3.4.1",
     "react": "16.12",
     "react-dom": "16.12",
     "react-redux": "7.1",
