@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "eBae",
+  "description": "eBae",
+  "version": "0.0.0.1",
+  "permissions": ["contextMenus", "tabs", "activeTab"],
+  "web_accessible_resources": ["images/*", "images/image.png", "image.png"],
+  "background": {
+    "scripts": ["event.js", "background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "eBae",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "images/image.png",
+    "48": "images/image.png",
+    "128": "images/image.png"
+  }
+}
