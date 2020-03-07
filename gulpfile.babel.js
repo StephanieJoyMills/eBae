@@ -9,9 +9,7 @@ import popupWebpackConfig from "./popup/webpack.config";
 import eventWebpackConfig from "./event/webpack.config";
 import backgroundWebpackConfig from "./background/webpack.config";
 import contentWebpackConfig from "./content/webpack.config";
-import pullRequestWebpackConfig from "./pull_request/webpack.config";
 import authWebpackConfig from "./auth/webpack.config";
-import reviewWebpackConfig from "./review/webpack.config";
 
 gulp.task("clean", (cb) => {
   rimraf("./build", cb);
@@ -28,6 +26,19 @@ gulp.task(
   "copy-images",
   gulp.series("clean", () => {
     return gulp.src("./images/**/*").pipe(gulp.dest("./build/images"));
+  })
+);
+
+gulp.task(
+  "popup-js",
+  gulp.series("clean", (cb) => {
+    webpack(popupWebpackConfig, (err, stats) => {
+      if (err) throw new plugins.util.PluginError("webpack", err);
+
+      plugins.util.log("[webpack]", stats.toString());
+
+      cb();
+    });
   })
 );
 
