@@ -39,12 +39,13 @@ function App(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [values, setValues] = React.useState({
-    name: "Product Name",
-    price: 100,
+    name: props.title,
+    price: props.price,
     description: "This is the description of your product",
     quantity: 200,
-    image: ""
+    img: props.img
   });
+  console.log(values.img);
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -67,13 +68,13 @@ function App(props) {
         zIndex: 1000,
         position: "fixed",
         marginLeft: "65vw",
-        marginTop: "65vh"
+        marginTop: "55vh"
       }}
     >
       <Card className={classes.root}>
         <Typography
-          component="h4"
-          variant="h4"
+          component="h5"
+          variant="h5"
           style={{
             marginBottom: "17px",
             marginTop: "10px",
@@ -88,6 +89,7 @@ function App(props) {
               style={{
                 width: "10vw",
                 maxHeight: "25vh",
+
                 // marginTop: "120px",
                 textShadow: "2px 2px",
                 boxShadow: "1px 0.5px 5px #ccc",
@@ -96,7 +98,8 @@ function App(props) {
                 marginLeft: "20px",
                 marginRight: "0px"
               }}
-              src="chrome-extension://lglmjaemoonckpkabihkagdfoandpjjg/images/image.png"
+              // alt="chrome-extension://lglmjaemoonckpkabihkagdfoandpjjg/images/image.png"
+              src={values.img}
             ></img>
           </Grid>
           <Grid item sm={8}>

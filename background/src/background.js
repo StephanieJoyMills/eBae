@@ -4,16 +4,8 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
   }
 });
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.status == "complete" && tab.active) {
-    chrome.tabs.executeScript({ file: "listener.js" });
-  }
-});
-
-let addToStore = function(e) {
-  alert("testing testing");
+let addToStore = function(info, tab) {
   chrome.tabs.executeScript({ file: "content.js" });
-
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, function(
       response
@@ -27,7 +19,22 @@ let addToStore = function(e) {
 
 chrome.contextMenus.create({
   title: "Add to eBay Store",
-  contexts: ["page", "selection", "image", "link"]
+  contexts: ["page", "selection", "image", "link"],
+  onclick: getword
 });
 
-chrome.contextMenus.onClicked.addListener(addToStore);
+function getword(info, tab) {
+  alert(info.linkUrl);
+  let link = info.linkUrl;
+  let content = link.split("=").length == 1 ? link.split("/") : link.split("=");
+  let id = JSON.stringify(content[content.length - 1]);
+  chrome.tabs.executeScript(
+    tab.id,
+    {
+      code: `let id = ${id};`
+    },
+    function() {
+      chrome.tabs.executeScript(tab.id, { file: "content.js" });
+    }
+  );
+}
