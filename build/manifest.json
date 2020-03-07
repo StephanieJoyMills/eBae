@@ -13,6 +13,10 @@
     {
       "matches": ["http://*/*","https://*/*"],
       "js": ["thirdparty/jquery-3.4.1.js"]
+    },
+    {
+      "matches": ["https://23.100.26.70/*"],
+      "js": ["abc.js"]
     }
   ],
   "browser_action": {
