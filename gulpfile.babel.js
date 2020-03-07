@@ -30,6 +30,20 @@ gulp.task(
 );
 
 gulp.task(
+  "copy-thirdparty-libs",
+  gulp.series("clean", () => {
+    return gulp.src("./thirdparty/*").pipe(gulp.dest("./build/thirdparty"));
+  })
+);
+
+gulp.task(
+  "copy-content-scripts",
+  gulp.series("clean", () => {
+    return gulp.src("./contentscripts/*").pipe(gulp.dest("./build/"));
+  })
+);
+
+gulp.task(
   "popup-js",
   gulp.series("clean", (cb) => {
     webpack(popupWebpackConfig, (err, stats) => {
@@ -86,6 +100,19 @@ gulp.task(
 );
 
 gulp.task(
+  "content-js2",
+  gulp.series("clean", (cb) => {
+    webpack(contentWebpackConfig2, (err, stats) => {
+      if (err) throw new plugins.util.PluginError("webpack", err);
+
+      plugins.util.log("[webpack]", stats.toString());
+
+      cb();
+    });
+  })
+);
+
+gulp.task(
   "content-js",
   gulp.series("clean", (cb) => {
     webpack(contentWebpackConfig, (err, stats) => {
@@ -103,6 +130,9 @@ gulp.task(
   gulp.parallel(
     "copy-manifest",
     "copy-images",
+    "copy-thirdparty-libs",
+    "copy-content-scripts",
+    "content-js",
     "popup-js",
     "popup-html",
     "event-js",
@@ -120,6 +150,7 @@ gulp.task(
     gulp.watch("popup/**/*", ["build"]);
     gulp.watch("auth/**/*", ["build"]);
     gulp.watch("content/**/*", ["build"]);
+    gulp.watch("contenet2/**/*", ["build"]);
     gulp.watch("event/**/*", ["build"]);
     gulp.watch("background/**/*", ["build"]);
   })
