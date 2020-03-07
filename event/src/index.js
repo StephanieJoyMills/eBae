@@ -17,7 +17,7 @@ const store = createStore(rootReducer, persistedState);
 store.subscribe(() => {
   let state = store.getState();
   saveState({
-    auth: state.auth
+    // auth: state.auth
   });
 });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { authCheck } from "../../../../../event/src/actions";
+// import { authCheck } from "../../../../../event/src/actions";
 
 const mapStateToProps = (state) => {
   return {
@@ -10,7 +10,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  authCheck
+  // authCheck
 };
 
 function App(props) {
@@ -18,7 +18,7 @@ function App(props) {
   // console.log("huh", props.count);
 
   useEffect(() => {
-    props.authCheck();
+    // props.authCheck();
   }, []);
 
   return (

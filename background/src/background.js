@@ -11,7 +11,7 @@ let addToStore = function(e) {
 
 chrome.contextMenus.create({
   title: "Add to eBay Store",
-  contexts: ["selection"]
+  contexts: ["page", "selection", "image", "link"]
 });
 
 chrome.contextMenus.onClicked.addListener(addToStore);
