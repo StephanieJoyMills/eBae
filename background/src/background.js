@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
 
 let addToStore = function(e) {
   alert("testing testing");
-  //  chrome.tabs.executeScript({ file: "pop-up-thingie.js" });
+  chrome.tabs.executeScript({ file: "content.js" });
 };
 
 chrome.contextMenus.create({

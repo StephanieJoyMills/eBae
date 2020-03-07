@@ -1,21 +1,22 @@
-import React from 'react';
-import {render} from 'react-dom';
-import {Provider} from 'react-redux';
-import {Store} from 'webext-redux';
+import React from "react";
+import { render } from "react-dom";
+import { Provider } from "react-redux";
+import { Store } from "webext-redux";
 
-import App from './components/app/App';
+import App from "./components/app/App";
 
 const proxyStore = new Store();
 
-const anchor = document.createElement('div');
-anchor.id = 'rcr-anchor';
+const anchor = document.createElement("div");
+anchor.id = "rcr-anchor";
 
 document.body.insertBefore(anchor, document.body.childNodes[0]);
-
+console.log("We made it in the script!");
 proxyStore.ready().then(() => {
   render(
     <Provider store={proxyStore}>
-      <App/>
-    </Provider>
-   , document.getElementById('rcr-anchor'));
+      <App />
+    </Provider>,
+    document.getElementById("rcr-anchor")
+  );
 });

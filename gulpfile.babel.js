@@ -107,7 +107,8 @@ gulp.task(
     "popup-html",
     "event-js",
     "background-js",
-    "auth-js"
+    "auth-js",
+    "content-js"
   )
 );
 
