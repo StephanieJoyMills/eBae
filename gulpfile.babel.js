@@ -34,7 +34,6 @@ gulp.task(
   gulp.series("clean", (cb) => {
     webpack(popupWebpackConfig, (err, stats) => {
       if (err) throw new plugins.util.PluginError("webpack", err);
-
       plugins.util.log("[webpack]", stats.toString());
 
       cb();
