@@ -50,169 +50,202 @@ import image2 from "assets/img/xapple-icon.png";
 
 const useStyles = makeStyles(signupPageStyle);
 
-
-function registerIds(key, data){
-    returnPolicyPromise = createReturnPolicy(key, true),
-    paymentPolicyPromise = createPaymentPolicy(key),
-    fulfillmentPromise = createFulfillmentPolicy(key, "USPS", "USPSPriorityFlatRateBox"),
-		registerLocation(key,data.address[0],"",data.address[1], data.address[2], '94112',data.address[3]]); // todo
-		returnPolicyPromise.then((returnPolicy) =>
-    returnPolicyId = returnPolicy.data.returnPolicyId)
-		.catch(error => {
-		  returnPolicyId = error.response.data.errors[0].parameters[0].value;
+async function registerIds(key, data) {
+  (returnPolicyPromise = createReturnPolicy(key, true)),
+    (paymentPolicyPromise = createPaymentPolicy(key)),
+    (fulfillmentPromise = createFulfillmentPolicy(
+      key,
+      "USPS",
+      "USPSPriorityFlatRateBox"
+    )),
+    registerLocation(
+      key,
+      data.address[0],
+      "",
+      data.address[1],
+      data.address[2],
+      "94112",
+      data.address[3]
+    ); // todo
+  returnPolicyPromise
+    .then((returnPolicy) => (returnPolicyId = returnPolicy.data.returnPolicyId))
+    .catch((error) => {
+      returnPolicyId = error.response.data.errors[0].parameters[0].value;
     });
-		paymentPolicyPromise.then((paymentPolicy) =>
-    paymentId = paymentPolicy.data.paymentPolicyId)
-		.catch(error => {
-		  paymentId = error.response.data.errors[0].parameters[2].value;
+  paymentPolicyPromise
+    .then((paymentPolicy) => (paymentId = paymentPolicy.data.paymentPolicyId))
+    .catch((error) => {
+      paymentId = error.response.data.errors[0].parameters[2].value;
     });
-		fulfillmentPromise.then((fulfillmentPolicy) =>
-    fulfillmentId = fulfillmentPolicy.data.fulfillmentPolicyId)
-		.catch(error => {
-		  fulfillmentId = error.response.data.errors[0].parameters[0].value;
+  fulfillmentPromise
+    .then(
+      (fulfillmentPolicy) =>
+        (fulfillmentId = fulfillmentPolicy.data.fulfillmentPolicyId)
+    )
+    .catch((error) => {
+      fulfillmentId = error.response.data.errors[0].parameters[0].value;
     });
-    let res = await axios({
-      method: "post",
-      url: `https://23.100.26.70/cachevars`,
-      data: {
-        fulfillmentId: fulfillmentId,
-        locationId: "eBaeDefault",
-        paymentId: paymentId,
-        returnPolicyId: returnPolicyId
-      }
-    });
-	  console.log(returnPolicyId, paymentId, fulfillmentId);
+  let res = await axios({
+    method: "post",
+    url: `https://23.100.26.70/cachevars`,
+    data: {
+      fulfillmentId: fulfillmentId,
+      locationId: "eBaeDefault",
+      paymentId: paymentId,
+      returnPolicyId: returnPolicyId
+    }
+  });
+  console.log(returnPolicyId, paymentId, fulfillmentId);
 }
 
-function enroll(data){
-  getKey().then(function(resp)
+function enroll(data) {
+  getKey().then(function(resp) {
+    key = resp.data;
+    registerIds(key, data);
+  });
+}
+
+function registerLocation(
+  key,
+  name,
+  addressLine1,
+  addressLine2,
+  city,
+  state,
+  postalCode,
+  country
+) {
+  return makeEbayRequest(
+    key,
     {
-      key = resp.data;
-      registerIds(key, data);
-    });
-}
-
-function registerLocation(key, name, addressLine1, addressLine2, city, state, postalCode, country){
-  return makeEbayRequest(key, {
-    location: {
-      address: {
-        addressLine1: addressLine1,
-        addressLine2: addressLine2,
-        city: city,
-        state: state,
-        postalCode: postalCode,
-        country: country
-      }
+      location: {
+        address: {
+          addressLine1: addressLine1,
+          addressLine2: addressLine2,
+          city: city,
+          state: state,
+          postalCode: postalCode,
+          country: country
+        }
+      },
+      name: name,
+      merchantLocationStatus: "ENABLED",
+      locationTypes: ["Home"]
     },
-    name: name,
-    merchantLocationStatus: "ENABLED",
-    locationTypes: [
-      "Home"
-    ]
-  },
-  "https://api.ebay.com/sell/inventory/v1/location/eBaeDefault")
+    "https://api.ebay.com/sell/inventory/v1/location/eBaeDefault"
+  );
 }
-
 
 async function passInfo(data) {
   data.refund = String(data.refund);
   data.address = data.address.split(",");
-	enroll(data);
+  enroll(data);
   // (get url from server & redirect)
 }
 
-function getKey(){
+function getKey() {
   return axios.request({
     method: "get",
     url: "https://23.100.26.70/get"
   });
 }
 
-function makeEbayRequest(key, data, url){
+function makeEbayRequest(key, data, url) {
   return axios.request({
     method: "post",
     url: url,
     data: data,
     headers: {
-      "Authorization": `Bearer ${key}`,
-      "Accept": "application/json",
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json",
       "Content-Type": "application/json",
       "Content-Language": "en-US"
     }
   });
 }
 
-function createReturnPolicy(key, accepted){
-  return makeEbayRequest(key, {
-    name: "eBae default",
-    marketplaceId: "EBAY_US",
-    refundMethod: "MONEY_BACK",
-    returnsAccepted: accepted,
-    returnShippingCostPayer: "BUYER",
-    returnPeriod: {
-      value: 30,
-      unit: "DAY"
-    }
-  },
-  "https://api.ebay.com/sell/account/v1/return_policy");
-}
-
-function createPaymentPolicy(key){
-  return makeEbayRequest(key, {
-    name: "eBaeDefault",
-    marketplaceId: "EBAY_US",
-		categoryTypes: [
-				{
-					name: "ALL_EXCLUDING_MOTORS_VEHICLES"
-				}
-			],
-		paymentMethods: [
-			{
-				brands: ["VISA", "MASTERCARD"],
-				paymentMethodType: "CREDIT_CARD"
-			}
-		]
-  },
-  "https://api.ebay.com/sell/account/v1/payment_policy");
-}
-
-function createFulfillmentPolicy(key, shippingCarrierCode, shippingServiceCode){
-  return makeEbayRequest(key, {
-    name: "eBaeDefault",
-    marketplaceId: "EBAY_US",
-		categoryTypes: [
-				{
-					name: "ALL_EXCLUDING_MOTORS_VEHICLES"
-				}
-			],
-		globalShipping: "false",
-		handlingTime: {
-      unit: "DAY",
-      value: "1"
-		},
-    shippingOption: [
-      {
-        costType: "FLAT_RATE",
-        optionType: "DOMESTIC",
-        shippingService: [
-          {
-            buyerResponsibleForShipping: "false",
-            freeShipping: "true",
-            shippingCarrierCode: shippingCarrierCode,
-            shippingServiceCode: shippingServiceCode,
-            shippingCost: {
-              currency: "USD",
-              value: "0.0"
-            }
-          }
-        ]
+function createReturnPolicy(key, accepted) {
+  return makeEbayRequest(
+    key,
+    {
+      name: "eBae default",
+      marketplaceId: "EBAY_US",
+      refundMethod: "MONEY_BACK",
+      returnsAccepted: accepted,
+      returnShippingCostPayer: "BUYER",
+      returnPeriod: {
+        value: 30,
+        unit: "DAY"
       }
-    ]
-  },
-  "https://api.ebay.com/sell/account/v1/fulfillment_policy");
+    },
+    "https://api.ebay.com/sell/account/v1/return_policy"
+  );
 }
 
+function createPaymentPolicy(key) {
+  return makeEbayRequest(
+    key,
+    {
+      name: "eBaeDefault",
+      marketplaceId: "EBAY_US",
+      categoryTypes: [
+        {
+          name: "ALL_EXCLUDING_MOTORS_VEHICLES"
+        }
+      ],
+      paymentMethods: [
+        {
+          brands: ["VISA", "MASTERCARD"],
+          paymentMethodType: "CREDIT_CARD"
+        }
+      ]
+    },
+    "https://api.ebay.com/sell/account/v1/payment_policy"
+  );
+}
 
+function createFulfillmentPolicy(
+  key,
+  shippingCarrierCode,
+  shippingServiceCode
+) {
+  return makeEbayRequest(
+    key,
+    {
+      name: "eBaeDefault",
+      marketplaceId: "EBAY_US",
+      categoryTypes: [
+        {
+          name: "ALL_EXCLUDING_MOTORS_VEHICLES"
+        }
+      ],
+      globalShipping: "false",
+      handlingTime: {
+        unit: "DAY",
+        value: "1"
+      },
+      shippingOption: [
+        {
+          costType: "FLAT_RATE",
+          optionType: "DOMESTIC",
+          shippingService: [
+            {
+              buyerResponsibleForShipping: "false",
+              freeShipping: "true",
+              shippingCarrierCode: shippingCarrierCode,
+              shippingServiceCode: shippingServiceCode,
+              shippingCost: {
+                currency: "USD",
+                value: "0.0"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "https://api.ebay.com/sell/account/v1/fulfillment_policy"
+  );
+}
 
 export default function SignUpPage({ ...rest }) {
   const [checked, setChecked] = React.useState([1]);
