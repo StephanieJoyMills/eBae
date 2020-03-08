@@ -46,6 +46,7 @@ import Searchbar from "./Location";
 import signupPageStyle from "assets/jss/material-kit-pro-react/views/signupPageStyle.js";
 
 import image from "assets/img/bg7.jpg";
+import image2 from "assets/img/xapple-icon.png";
 
 const useStyles = makeStyles(signupPageStyle);
 
@@ -91,6 +92,16 @@ export default function SignUpPage({ ...rest }) {
   const classes = useStyles();
   return (
     <div>
+      <img
+        style={{
+          width: "4%",
+          position: "fixed",
+          zIndex: "100",
+          marginTop: "30px",
+          marginLeft: "105px"
+        }}
+        src={image2}
+      ></img>
       <Header absolute color="transparent" brand="eBae" {...rest} />
       <div
         className={classes.pageHeader}
@@ -122,7 +133,7 @@ export default function SignUpPage({ ...rest }) {
                       />
                       <InfoArea
                         className={classes.infoArea}
-                        title="Effortless additions"
+                        title="Fast integration. Faster sales"
                         description="Right click on product to quickly add them into eBay"
                         icon={Timeline}
                         iconColor="rose"
@@ -130,7 +141,7 @@ export default function SignUpPage({ ...rest }) {
                       <InfoArea
                         className={classes.infoArea}
                         title="Cross Site Compatible"
-                        description="User eBae with each and everone of your online stores"
+                        description="User eBae with each and everyone of your online stores"
                         icon={Code}
                         iconColor="primary"
                       />
@@ -144,12 +155,13 @@ export default function SignUpPage({ ...rest }) {
                         <Typography
                           variant="h7"
                           style={{
-                            color: "rgb(136,136,136)",
+                            color: "rgb(76,162,244)",
                             fontSize: "18px",
                             fontWeight: "100",
-                            marginTop: "15px",
-                            marginBottom: "37px",
-                            borderBottom: "solid rgba(0, 0, 0, 0.5) 0.5px"
+                            marginTop: "25px",
+                            marginLeft: "30px",
+                            marginBottom: "10px"
+                            // borderBottom: "solid pink 0.5px"
                           }}
                           component="h2"
                         >
@@ -199,7 +211,11 @@ export default function SignUpPage({ ...rest }) {
                             style={{ marginTop: "40px" }}
                             onClick={(e) => passInfo(values)}
                           >
-                            <Button round color="primary">
+                            <Button
+                              round
+                              color="primary"
+                              style={{ backgroundColor: "rgba(62,130,212,1)" }}
+                            >
                               Ready to go!
                             </Button>
                           </div>

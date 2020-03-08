@@ -32,11 +32,7 @@ const signupPageStyle = {
     },
     "&:after": {
       background:
-        "linear-gradient(60deg,rgba(" +
-        hexToRgb(primaryColor[4]) +
-        ",.56),rgba(" +
-        hexToRgb(primaryColor[5]) +
-        ",.95))"
+        "linear-gradient(174deg, rgba(18,32,116,0.5) 0%, rgba(76,162,244,0.5) 100%)"
     },
     "&:before,&:after": {
       position: "absolute",
