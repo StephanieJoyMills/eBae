@@ -106,25 +106,25 @@ function createItem(key, sku, itemName, aspects, description, imgurl){
 function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description){
   return makeEbayRequest(key,
     {
-    sku: sku,
-    marketplaceId: "EBAY_US",
-    format: "FIXED_PRICE",
-    availableQuantity: 1,
-    merchantLocationKey: locationId,
-    categoryId: 30120, // could replace with call to suggestions in the futureu
-    listingDescription: description,
-    listingPolicies: {
-      fulfillmentPolicyId: fulfillmentId,
-      paymentPolicyId: paymentId,
-      returnPolicyId: returnPolicyId
+      sku: sku,
+      marketplaceId: "EBAY_US",
+      format: "FIXED_PRICE",
+      availableQuantity: 1,
+      merchantLocationKey: locationId,
+      categoryId: 30120, // could replace with call to suggestions in the futureu
+      listingDescription: description,
+      listingPolicies: {
+        fulfillmentPolicyId: fulfillmentId,
+        paymentPolicyId: paymentId,
+        returnPolicyId: returnPolicyId
+      },
+      pricingSummary: {
+        price: {
+          currency: "USD",
+          value: price
+        }
+      },
     },
-    pricingSummary: {
-      price: {
-        currency: "USD",
-        value: price
-      }
-    },
-  }
     `https://api.ebay.com/sell/inventory/v1/offer`
   );
 }
