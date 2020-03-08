@@ -11,7 +11,21 @@ const anchor = document.createElement("div");
 anchor.id = "rcr-anchor";
 
 let element = document.querySelector(`a[href*="${id}"]`);
-let img = element.getElementsByTagName("img")[0].getAttribute("src");
+console.log(element);
+let imgObj = element.getElementsByTagName("img")[0];
+console.log(imgObj);
+let img;
+if (imgObj) {
+  img = imgObj.getAttribute("src");
+  img = img ? img : imgObj.getAttribute("srcset");
+} else {
+  img = element
+    .getElementsByTagName("div")[0]
+    .style.backgroundImage.replace(`url("//`, "https://")
+    .replace(`")`, "");
+  console.log(img);
+}
+
 let price = "";
 let title = "";
 let count = 10;
@@ -20,7 +34,19 @@ while (count > 0 && (price == "" || title == "")) {
   if (text !== "") {
     let checkCurrency = text.split("$");
     if (checkCurrency.length !== 1) {
-      price = checkCurrency[checkCurrency.length - 1];
+      if (checkCurrency[0].match(/[0-9]+.?[0-9]*/)) {
+        price = checkCurrency[0];
+        if (checkCurrency[1] !== "") {
+          title = checkCurrency[1];
+        }
+      } else {
+        price = checkCurrency[1];
+        if (checkCurrency[0] !== "") {
+          title = checkCurrency[0];
+        }
+      }
+
+      // price = checkCurrency[checkCurrency.length - 1];
     } else {
       title = checkCurrency[0];
     }
