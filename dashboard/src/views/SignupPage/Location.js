@@ -49,9 +49,11 @@ class SearchBar extends React.Component {
 
   handleSelect = (selected) => {
     this.setState({ isGeocoding: true, address: selected });
+    this.props.onEdit(selected);
     geocodeByAddress(selected)
       .then((res) => getLatLng(res[0]))
       .then(({ lat, lng }) => {
+        // call function here
         this.setState({
           latitude: lat,
           longitude: lng,

@@ -63,7 +63,8 @@ export default function SignUpPage({ ...rest }) {
   const [checked, setChecked] = React.useState([1]);
   const [values, setValues] = React.useState({
     shipping: "",
-    refund: false
+    refund: false,
+    address: ""
     // price: props.price,
     // description: "This is the description of your product",
     // quantity: 200,
@@ -78,6 +79,10 @@ export default function SignUpPage({ ...rest }) {
     }
   };
 
+  function handleEdit(data) {
+    setValues({ ...values, address: data });
+  }
+  //
   React.useEffect(() => {
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
@@ -174,7 +179,7 @@ export default function SignUpPage({ ...rest }) {
                               width: "113%"
                             }}
                           >
-                            <Searchbar />
+                            <Searchbar onEdit={(data) => handleEdit(data)} />
                           </div>
                           <FormControlLabel
                             style={{ marginTop: "25px" }}
