@@ -54,7 +54,7 @@ function registerIds(key, data){
     returnPolicyPromise = createReturnPolicy(key, true),
     paymentPolicyPromise = createPaymentPolicy(key),
     fulfillmentPromise = createFulfillmentPolicy(key, "USPS", "USPSPriorityFlatRateBox"),
-		registerLocation(key,); // todo
+		registerLocation(key,data.address[0],"",data.address[1], data.address[2], '94112',data.address[3]]); // todo
 		returnPolicyPromise.then((returnPolicy) =>
     returnPolicyId = returnPolicy.data.returnPolicyId)
 		.catch(error => {
@@ -69,6 +69,16 @@ function registerIds(key, data){
     fulfillmentId = fulfillmentPolicy.data.fulfillmentPolicyId)
 		.catch(error => {
 		  fulfillmentId = error.response.data.errors[0].parameters[0].value;
+    });
+    let res = await axios({
+      method: "post",
+      url: `https://23.100.26.70/cachevars`,
+      data: {
+        fulfillmentId: fulfillmentId,
+        locationId: "eBaeDefault",
+        paymentId: paymentId,
+        returnPolicyId: returnPolicyId
+      }
     });
 	  console.log(returnPolicyId, paymentId, fulfillmentId);
 }
@@ -105,12 +115,8 @@ function registerLocation(key, name, addressLine1, addressLine2, city, state, po
 
 async function passInfo(data) {
   data.refund = String(data.refund);
+  data.address = data.address.split(",");
 	enroll(data);
-  let res = await axios({
-    method: "post",
-    url: `https://23.100.26.70/cachevars`,
-    data: data
-  });
   // (get url from server & redirect)
 }
 
