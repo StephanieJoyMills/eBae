@@ -72,11 +72,6 @@ async function registerIds(key, data) {
     .catch((error) => {
       returnPolicyId = error.response.data.errors[0].parameters[0].value;
     });
-  paymentPolicyPromise
-    .then((paymentPolicy) => (paymentId = paymentPolicy.data.paymentPolicyId))
-    .catch((error) => {
-      paymentId = error.response.data.errors[0].parameters[2].value;
-    });
   fulfillmentPromise
     .then(
       (fulfillmentPolicy) =>
@@ -126,20 +121,28 @@ function registerLocation(
           state: state,
           postalCode: postalCode,
           country: country
-        }
-      },
-      name: name,
-      merchantLocationStatus: "ENABLED",
-      locationTypes: ["Home"]
-    },
-    "https://api.ebay.com/sell/inventory/v1/location/eBaeDefault"
-  );
+        },
+    name: name,
+    merchantLocationStatus: "ENABLED",
+    locationTypes: [
+      "WAREHOUSE"
+    ]
+  },
+  "https://api.ebay.com/sell/inventory/v1/location/eBaeDefault")
 }
 
 async function passInfo(data) {
   data.refund = String(data.refund);
+<<<<<<< HEAD
   data.address = data.address.split(",");
   enroll(data);
+=======
+  console.log("HI");
+  console.log(data);
+  console.log(data.address);
+  data.addressSplit = data.address.split(",");
+	enroll(data);
+>>>>>>> c12fcf778b8cd59ea09d45dd972e57f379355c47
   // (get url from server & redirect)
 }
 
@@ -278,6 +281,7 @@ export default function SignUpPage({ ...rest }) {
   const classes = useStyles();
   return (
     <div>
+      <div id='closepage'></div>
       <img
         style={{
           width: "4%",
