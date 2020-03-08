@@ -31,16 +31,20 @@ def reg():
     print(key)
     return "Authenticated, you can close me now"
 
-@app.route('/cachevars')
+@app.route('/cachevars', methods = ['POST'])
 def cache():
     global cachedvars
-    cachedvars[request.remote_addr] = request.args['data']
+    print(request.form)
+    print(request.remote_addr)
+    cachedvars[request.remote_addr] = request.get_json()
+    print("HI")
     return "done"
 
-@app.route('/getcachevars')
+@app.route('/getcachedvars')
 def getcache():
     global cachedvars
-    return cachedvars[request.remote_addr]
+    print(cachedvars[request.remote_addr])
+    return str(cachedvars[request.remote_addr])
 
 
 if __name__ == '__main__':
