@@ -11,15 +11,8 @@ const middleware = [thunkMiddleware];
 const proxyStore = applyMiddleware(store, ...middleware);
 
 proxyStore.ready().then(() => {
-  let hook = document.getElementsByClassName(
-    "Header-link notification-indicator"
-  )[0].parentElement;
-  console.log(
-    document.getElementsByClassName("Header-link notification-indicator")
-  );
-  console.log("in auth");
+  let hook = document.getElementsByTagName("body")[0];
 
-  console.log(hook.parentElement);
   let anchor = document.createElement("div");
   let id = "auth-anchor";
   anchor.id = id;
