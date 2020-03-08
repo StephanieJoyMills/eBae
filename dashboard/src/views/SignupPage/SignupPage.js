@@ -50,11 +50,12 @@ import image from "assets/img/bg7.jpg";
 const useStyles = makeStyles(signupPageStyle);
 
 async function passInfo(data) {
+  data.refund = String(data.refund);
   let basePath = "hello";
   let res = await axios({
     method: "post",
     url: `https://23.100.26.70/cachevars`,
-    data
+    data: data
   });
   // (get url from server & redirect)
 }
@@ -191,7 +192,7 @@ export default function SignUpPage({ ...rest }) {
                           <div
                             className={classes.textCenter}
                             style={{ marginTop: "40px" }}
-                            onClick={passInfo(values)}
+                            onClick={(e) => passInfo(values)}
                           >
                             <Button round color="primary">
                               Ready to go!
