@@ -2,6 +2,7 @@ from flask import Flask,request
 import requests
 from collections import defaultdict
 import ssl
+import json
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain('./cert.pem', './key.pem')
 
@@ -18,7 +19,7 @@ def index():
     global code
     d = {"grant_type":"authorization_code", "code":key[request.remote_addr], "redirect_uri":"Oscar_Shi-OscarShi-eBae-P-pqjdex"}
     rq = requests.post('https://api.ebay.com/identity/v1/oauth2/token', data=d, headers=hds)
-    if(rq.status_code != 500):
+    if(rq.status_code == 200):
         print(rq.json()['access_token'])
         code[request.remote_addr] = rq.json()['access_token']
     return code[request.remote_addr];
@@ -44,7 +45,7 @@ def cache():
 def getcache():
     global cachedvars
     print(cachedvars[request.remote_addr])
-    return str(cachedvars[request.remote_addr])
+    return json.dumps(cachedvars[request.remote_addr])
 
 
 if __name__ == '__main__':

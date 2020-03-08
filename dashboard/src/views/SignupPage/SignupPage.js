@@ -49,12 +49,16 @@ import image from "assets/img/bg7.jpg";
 
 const useStyles = makeStyles(signupPageStyle);
 
+var returnPolicyId = "";
+var paymentId = "";
+var fulfillmentId = "";
 
-function registerIds(key, data){
-    returnPolicyPromise = createReturnPolicy(key, true),
-    paymentPolicyPromise = createPaymentPolicy(key),
-    fulfillmentPromise = createFulfillmentPolicy(key, "USPS", "USPSPriorityFlatRateBox"),
-		registerLocation(key,data.address[0],"",data.address[1], data.address[2], '94112',data.address[3]]); // todo
+
+async function registerIds(key, data){
+    let returnPolicyPromise = createReturnPolicy(key, true);
+    let paymentPolicyPromise = createPaymentPolicy(key);
+    let fulfillmentPromise = createFulfillmentPolicy(key, "USPS", "USPSPriorityFlatRateBox");
+		registerLocation(key,"ebayDefault",data.addressSplit[0].trim(),"",data.addressSplit[1].trim(), data.addressSplit[2].trim(), '94112',"US").catch(error => console.log(error));
 		returnPolicyPromise.then((returnPolicy) =>
     returnPolicyId = returnPolicy.data.returnPolicyId)
 		.catch(error => {
@@ -70,23 +74,26 @@ function registerIds(key, data){
 		.catch(error => {
 		  fulfillmentId = error.response.data.errors[0].parameters[0].value;
     });
-    let res = await axios({
-      method: "post",
-      url: `https://23.100.26.70/cachevars`,
-      data: {
-        fulfillmentId: fulfillmentId,
-        locationId: "eBaeDefault",
-        paymentId: paymentId,
-        returnPolicyId: returnPolicyId
-      }
-    });
+    Promise.allSettled([fulfillmentPromise, paymentPolicyPromise, returnPolicyId]).
+		then(function(){
+	    axios({
+	      method: "post",
+	      url: `https://23.100.26.70/cachevars`,
+	      data: {
+		fulfillmentId: fulfillmentId,
+		locationId: "eBaeDefault",
+		paymentId: paymentId,
+		returnPolicyId: returnPolicyId
+	      }
+	    }).then(function(){document.getElementById("closepage").innerText="HI"});
+		});
 	  console.log(returnPolicyId, paymentId, fulfillmentId);
 }
 
 function enroll(data){
   getKey().then(function(resp)
     {
-      key = resp.data;
+      let key = resp.data;
       registerIds(key, data);
     });
 }
@@ -106,7 +113,7 @@ function registerLocation(key, name, addressLine1, addressLine2, city, state, po
     name: name,
     merchantLocationStatus: "ENABLED",
     locationTypes: [
-      "Home"
+      "WAREHOUSE"
     ]
   },
   "https://api.ebay.com/sell/inventory/v1/location/eBaeDefault")
@@ -115,7 +122,10 @@ function registerLocation(key, name, addressLine1, addressLine2, city, state, po
 
 async function passInfo(data) {
   data.refund = String(data.refund);
-  data.address = data.address.split(",");
+  console.log("HI");
+  console.log(data);
+  console.log(data.address);
+  data.addressSplit = data.address.split(",");
 	enroll(data);
   // (get url from server & redirect)
 }
@@ -244,6 +254,7 @@ export default function SignUpPage({ ...rest }) {
   const classes = useStyles();
   return (
     <div>
+      <div id='closepage'></div>
       <Header absolute color="transparent" brand="eBae" {...rest} />
       <div
         className={classes.pageHeader}
