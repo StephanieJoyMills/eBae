@@ -222,12 +222,13 @@ function registerIds(){
     returnPolicyId = returnPolicy.data.returnPolicyId;
     paymentId = paymentPolicy.data.paymentPolicyId;
     fulfillmentId = fulfillmentPolicy.data.fulfillmentPolicyId;
+	  console.log(returnPolicyId, paymentId, fulfillmentId);
   })).catch(errors => {
 		returnPolicyId = errors[0].error.response.data.errors[0].parameters[0].value;
 		paymentId = errors[1].error.response.data.errors[0].parameters[2].value;
 		fulfillmentId = errors[2].error.response.data.errors[0].parameters[0].value;
+	  console.log("ERRORPATH", returnPolicyId, paymentId, fulfillmentId);
   });
-	console.log(returnPolicyId, paymentId, fulfillmentId);
 }
 
 function enroll(){
