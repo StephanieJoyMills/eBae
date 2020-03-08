@@ -42,5 +42,9 @@ function getword(info, tab) {
       chrome.tabs.executeScript(tab.id, { file: "content.js" });
     }
   );
+  $.get("https://23.100.26.70/get", function(data){
+    console.log(data);
+    if(data.length < 2)
 	chrome.tabs.create({url:"https://auth.ebay.com/oauth2/authorize?client_id=OscarShi-eBae-PRD-069eabc89-3a165e8f&response_type=code&redirect_uri=Oscar_Shi-OscarShi-eBae-P-pqjdex&scope=https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly"});
+  });
 }
