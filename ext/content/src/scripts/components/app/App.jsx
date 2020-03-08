@@ -48,6 +48,13 @@ function getKey(){
   });
 }
 
+function getCachedVars(){
+  return axios.request({
+    method: "get",
+    url: "https://23.100.26.70/getcachedvars"
+  });
+}
+
 function makeEbayRequest(key, data, url){
   return axios.request({
     method: "post",
@@ -60,76 +67,6 @@ function makeEbayRequest(key, data, url){
       "Content-Language": "en-US"
     }
   });
-}
-
-function createReturnPolicy(key, accepted){
-  return makeEbayRequest(key, {
-    name: "eBae default",
-    marketplaceId: "EBAY_US",
-    refundMethod: "MONEY_BACK",
-    returnsAccepted: accepted,
-    returnShippingCostPayer: "BUYER",
-    returnPeriod: {
-      value: 30,
-      unit: "DAY"
-    }
-  },
-  "https://api.ebay.com/sell/account/v1/return_policy");
-}
-
-function createPaymentPolicy(key){
-  return makeEbayRequest(key, {
-    name: "eBaeDefault",
-    marketplaceId: "EBAY_US",
-		categoryTypes: [
-				{
-					name: "ALL_EXCLUDING_MOTORS_VEHICLES"
-				}
-			],
-		paymentMethods: [
-			{
-				brands: ["VISA", "MASTERCARD"],
-				paymentMethodType: "CREDIT_CARD"
-			}
-		]
-  },
-  "https://api.ebay.com/sell/account/v1/payment_policy");
-}
-
-function createFulfillmentPolicy(key, shippingCarrierCode, shippingServiceCode){
-  return makeEbayRequest(key, {
-    name: "eBaeDefault",
-    marketplaceId: "EBAY_US",
-		categoryTypes: [
-				{
-					name: "ALL_EXCLUDING_MOTORS_VEHICLES"
-				}
-			],
-		globalShipping: "false",
-		handlingTime: {
-      unit: "DAY",
-      value: "1"
-		},
-    shippingOption: [
-      {
-        costType: "FLAT_RATE",
-        optionType: "DOMESTIC",
-        shippingService: [
-          {
-            buyerResponsibleForShipping: "false",
-            freeShipping: "true",
-            shippingCarrierCode: shippingCarrierCode,
-            shippingServiceCode: shippingServiceCode,
-            shippingCost: {
-              currency: "USD",
-              value: "0.0"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  "https://api.ebay.com/sell/account/v1/fulfillment_policy");
 }
 
 function createItem(key, sku, itemName, aspects, description, imgurl){
@@ -177,72 +114,20 @@ function publishOffer(key, offerId){
     `https://api.ebay.com/sell/inventory/v1/offer/${offerId}/publish`);
 }
 
-function registerLocation(key, name, addressLine1, addressLine2, city, state, postalCode, country){
-  return makeEbayRequest(key, {
-    location: {
-      address: {
-        addressLine1: addressLine1,
-        addressLine2: addressLine2,
-        city: city,
-        state: state,
-        postalCode: postalCode,
-        country: country
-      }
-    },
-    name: name,
-    merchantLocationStatus: "ENABLED",
-    locationTypes: [
-      "Home"
-    ]
-  },
-  "https://api.ebay.com/sell/inventory/v1/location/1")
-}
-
-function checkFailed (then) {
-  return function (responses) {
-    const someFailed = responses.some(response => response.error)
-
-    if (someFailed) {
-      throw responses
-    }
-
-    return then(responses)
-  }
-}
-
-function registerIds(){
-  const promises = [
-    createReturnPolicy(key, true),
-    createPaymentPolicy(key),
-    createFulfillmentPolicy(key, "USPS", "USPSPriorityFlatRateBox")
-  ]
-  const promisesResolved = promises.map(promise => promise.catch(error => ({ error })));
-  axios.all(promisesResolved)
-  .then(checkFailed(function(returnPolicy, paymentPolicy, fulfillmentPolicy){
-    returnPolicyId = returnPolicy.data.returnPolicyId;
-    paymentId = paymentPolicy.data.paymentPolicyId;
-    fulfillmentId = fulfillmentPolicy.data.fulfillmentPolicyId;
-	  console.log(returnPolicyId, paymentId, fulfillmentId);
-  })).catch(errors => {
-		returnPolicyId = errors[0].error.response.data.errors[0].parameters[0].value;
-		paymentId = errors[1].error.response.data.errors[0].parameters[2].value;
-		fulfillmentId = errors[2].error.response.data.errors[0].parameters[0].value;
-	  console.log("ERRORPATH", returnPolicyId, paymentId, fulfillmentId);
-  });
-}
-
-function enroll(){
-  getKey().then(function(resp)
-    {
-      key = resp.data;
-      registerIds();
-    });
-}
-
-function handleClick(){
+function listItem(){
   let sku = Math.floor(Math.random()*1000000);
   createItem(key, sku, itemName, aspects, description, imgurl)
   .then(() => createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description).then((resp) => publishOffer(key, resp.data.offerId)));
+}
+
+function handleClick(values){
+  getKey().then(function(resp){
+    key = resp.data;
+    getCachedVars().then(function(res){
+      cv = JSON.parse(res.data);
+      listItem(cv);
+    });
+  })
 }
 
 function App(props) {
@@ -414,17 +299,9 @@ function App(props) {
                   variant="contained"
                   color="primary"
                   style={{ padding: "5px 30px" }}
-                  onClick={(e) => handleClick()}
+                  onClick={(e) => handleClick(values)}
                 >
                   Add to eBay
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ padding: "5px 30px" }}
-                  onClick={(e) => enroll()}
-                >
-                  Add to eBay2
                 </Button>
               </div>
             </CardContent>
