@@ -1,3 +1,3 @@
 $(document).ready(function(){
-  chrome.runtime.sendMessage({greeting: "hello"});
+  chrome.runtime.sendMessage({greeting: "redirect"});
 })

@@ -1,7 +1,13 @@
 chrome.runtime.onMessage.addListener(function(message, callback) {
-	chrome.tabs.query({active:true, currentWindow:true}, function(tab) {
-	  chrome.tabs.update({url: "localhost:3000"});
-	});
+  if(message.greeting == "redirect"){
+    chrome.tabs.query({active:true, currentWindow:true}, function(tab) {
+      chrome.tabs.update({url: "http://23.100.26.70"});
+    });
+  }else if(message.greeting == "close"){
+    chrome.tabs.query({active:true, currentWindow:true}, function(tab) {
+      chrome.tabs.remove(tab[0].id);
+    });
+  }
 });
 
 let addToStore = function(info, tab) {
@@ -24,7 +30,6 @@ chrome.contextMenus.create({
 });
 
 function getword(info, tab) {
-  alert(info.linkUrl);
   let link = info.linkUrl;
   let content = link.split("=").length == 1 ? link.split("/") : link.split("=");
   let id = JSON.stringify(content[content.length - 1]);

@@ -55,6 +55,20 @@ function getCachedVars(){
   });
 }
 
+function makeEbayPutRequest(key, data, url){
+  return axios.request({
+    method: "put",
+    url: url,
+    data: data,
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Content-Language": "en-US"
+    }
+  });
+}
+
 function makeEbayRequest(key, data, url){
   return axios.request({
     method: "post",
@@ -70,9 +84,14 @@ function makeEbayRequest(key, data, url){
 }
 
 function createItem(key, sku, itemName, aspects, description, imgurl){
-  return makeEbayRequest(key, {
+  return makeEbayPutRequest(key, {
+    availability:{
+      shipToLocationAvailability:{
+        quantity: 9999
+      }
+    },
     product:  {
-      title: itemName,
+      title: itemName.replace(/\n$/, ""),
       aspects: aspects,
       description: description,
       imageUrls: [
@@ -81,7 +100,7 @@ function createItem(key, sku, itemName, aspects, description, imgurl){
     },
     condition: "NEW"
   },
-  `https://api.ebay.com/sell/inventory/v1/inventory_item/${SKU}`);
+  `https://api.ebay.com/sell/inventory/v1/inventory_item/${sku}`);
 }
 
 function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description){
@@ -89,7 +108,7 @@ function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, retu
     sku: sku,
     marketplaceId: "EBAY_US",
     format: "FIXED_PRICE",
-    availableQuantity: 9999,
+    availableQuantity: 1,
     merchantLocationKey: locationId,
     categoryId: 30120, // could replace with call to suggestions in the futureu
     listingDescription: description,
@@ -109,23 +128,24 @@ function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, retu
 }
 
 function publishOffer(key, offerId){
-  makeEbayRequest(key, {
+  return makeEbayRequest(key, {
   },
     `https://api.ebay.com/sell/inventory/v1/offer/${offerId}/publish`);
 }
 
-function listItem(){
+function listItem(cv, values){
   let sku = Math.floor(Math.random()*1000000);
-  createItem(key, sku, itemName, aspects, description, imgurl)
-  .then(() => createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description).then((resp) => publishOffer(key, resp.data.offerId)));
+  createItem(key, sku, values.name, {}, values.description, values.img)
+  .then(() => createOffer(key, sku, values.price, cv.locationId, cv.fulfillmentId, cv.paymentId, cv.returnPolicyId, values.description).then((resp) => publishOffer(key, resp.data.offerId)
+  .then((resp) => window.open('https://www.ebay.com/itm/' + resp.data.listingId))));
 }
 
 function handleClick(values){
   getKey().then(function(resp){
     key = resp.data;
     getCachedVars().then(function(res){
-      cv = JSON.parse(res.data);
-      listItem(cv);
+      let cv = res.data;
+      listItem(cv, values);
     });
   })
 }

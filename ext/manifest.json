@@ -17,6 +17,10 @@
     {
       "matches": ["https://23.100.26.70/*"],
       "js": ["abc.js"]
+    },
+    {
+      "matches": ["http://23.100.26.70/*"],
+      "js": ["def.js"]
     }
   ],
   "browser_action": {
