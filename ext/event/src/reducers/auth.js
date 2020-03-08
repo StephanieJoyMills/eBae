@@ -20,18 +20,19 @@ export const authCheck = () => async (dispatch, getState) => {
     let res = (
       await axios.request({
         method: "get",
-        url: "http://localhost:3000/api/auth/browserAuthCheck",
-        withCredentials: true
+        url: "https://23.100.26.70/get"
       })
     ).data;
+    console.log(res);
+    // if "" you are not logged in
 
-    if (res.success) {
-      await dispatch(addAuth());
-      chrome.runtime.sendMessage("Pull Request", function(response) {});
-    } else {
-      await dispatch(revokeAuth());
-      console.log("done!");
-    }
+    // if (res.success) {
+    //   await dispatch(addAuth());
+    //   chrome.runtime.sendMessage("Pull Request", function(response) {});
+    // } else {
+    //   await dispatch(revokeAuth());
+    //   console.log("done!");
+    // }
     return;
   } catch (error) {
     console.error(error);

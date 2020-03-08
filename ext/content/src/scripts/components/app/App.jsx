@@ -41,23 +41,23 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function getKey(){
+function getKey() {
   return axios.request({
     method: "get",
     url: "https://23.100.26.70/get"
   });
 }
 
-function getCachedVars(){
+function getCachedVars() {
   return axios.request({
     method: "get",
     url: "https://23.100.26.70/getcachedvars"
   });
 }
 
-function makeEbayRequest(key, data, url){
+function makeEbayPutRequest(key, data, url){
   return axios.request({
-    method: "post",
+    method: "put",
     url: url,
     data: data,
     headers: {
@@ -69,10 +69,29 @@ function makeEbayRequest(key, data, url){
   });
 }
 
+function makeEbayRequest(key, data, url){
+  return axios.request({
+    method: "post",
+    url: url,
+    data: data,
+    headers: {
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Content-Language": "en-US"
+    }
+  });
+}
+
 function createItem(key, sku, itemName, aspects, description, imgurl){
-  return makeEbayRequest(key, {
+  return makeEbayPutRequest(key, {
+    availability:{
+      shipToLocationAvailability:{
+        quantity: 9999
+      }
+    },
     product:  {
-      title: itemName,
+      title: itemName.replace(/\n$/, ""),
       aspects: aspects,
       description: description,
       imageUrls: [
@@ -81,15 +100,16 @@ function createItem(key, sku, itemName, aspects, description, imgurl){
     },
     condition: "NEW"
   },
-  `https://api.ebay.com/sell/inventory/v1/inventory_item/${SKU}`);
+  `https://api.ebay.com/sell/inventory/v1/inventory_item/${sku}`);
 }
 
 function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description){
-  return makeEbayRequest(key, {
+  return makeEbayRequest(key,
+    {
     sku: sku,
     marketplaceId: "EBAY_US",
     format: "FIXED_PRICE",
-    availableQuantity: 9999,
+    availableQuantity: 1,
     merchantLocationKey: locationId,
     categoryId: 30120, // could replace with call to suggestions in the futureu
     listingDescription: description,
@@ -103,31 +123,33 @@ function createOffer(key, sku, price, locationId, fulfillmentId, paymentId, retu
         currency: "USD",
         value: price
       }
-    }
-  },
-  `https://api.ebay.com/sell/inventory/v1/offer`);
+    },
+  }
+    `https://api.ebay.com/sell/inventory/v1/offer`
+  );
 }
 
 function publishOffer(key, offerId){
-  makeEbayRequest(key, {
+  return makeEbayRequest(key, {
   },
     `https://api.ebay.com/sell/inventory/v1/offer/${offerId}/publish`);
 }
 
-function listItem(){
+function listItem(cv, values){
   let sku = Math.floor(Math.random()*1000000);
-  createItem(key, sku, itemName, aspects, description, imgurl)
-  .then(() => createOffer(key, sku, price, locationId, fulfillmentId, paymentId, returnPolicyId, description).then((resp) => publishOffer(key, resp.data.offerId)));
+  createItem(key, sku, values.name, {}, values.description, values.img)
+  .then(() => createOffer(key, sku, values.price, cv.locationId, cv.fulfillmentId, cv.paymentId, cv.returnPolicyId, values.description).then((resp) => publishOffer(key, resp.data.offerId)
+  .then((resp) => window.open('https://www.ebay.com/itm/' + resp.data.listingId))));
 }
 
-function handleClick(values){
-  getKey().then(function(resp){
+function handleClick(values) {
+  getKey().then(function(resp) {
     key = resp.data;
     getCachedVars().then(function(res){
-      cv = JSON.parse(res.data);
-      listItem(cv);
+      let cv = res.data;
+      listItem(cv, values);
     });
-  })
+  });
 }
 
 function App(props) {
@@ -154,7 +176,6 @@ function App(props) {
     // });
   }, []);
 
-
   return (
     <div
       style={{
@@ -167,28 +188,35 @@ function App(props) {
         marginTop: "55vh"
       }}
     >
-      <Card className={classes.root}>
+      <Card
+        className={classes.root}
+        style={{ boxShadow: "1px 0.5px 5px  rgb(76,162,244)" }}
+      >
         <Typography
-          component="h5"
-          variant="h5"
+          component="h4"
           style={{
-            marginBottom: "17px",
-            marginTop: "10px",
-            marginLeft: "25px"
+            marginBottom: "18px",
+            color: "rgb(76,162,244)",
+            fontSize: "18px",
+            letterSpacing: "2px",
+            marginTop: "25px",
+            marginLeft: "90px",
+            textTransform: "capitalize"
           }}
         >
-          Add your product to eBay
+          Let's add your product to eBay!
         </Typography>
         <Grid container spacing={4}>
           <Grid item sm={4}>
             <img
               style={{
                 width: "10vw",
+                objectFit: "cover",
                 maxHeight: "25vh",
-
-                // marginTop: "120px",
-                textShadow: "2px 2px",
+                minHeight: "25vh",
                 boxShadow: "1px 0.5px 5px #ccc",
+                marginTop: "10px",
+                textShadow: "2px 2px",
                 backgroundColor: "white",
                 borderRadius: "10px",
                 marginLeft: "20px",
@@ -205,7 +233,8 @@ function App(props) {
                 label="Product Name"
                 style={{
                   marginTop: "-5px",
-                  width: "95%"
+                  width: "95%",
+                  textTransform: "capitalize"
                   // border: "none",
                   // height: "20px",
                   // background: "none",
@@ -278,13 +307,17 @@ function App(props) {
               <Typography variant="h7" color="textSecondary">
                 <TextField
                   id="outlined-multiline-static"
-                  label="Multiline"
+                  label="Description"
                   multiline
                   rows="3"
                   value={values.description}
                   onChange={handleChange("description")}
                   variant="outlined"
-                  style={{ marginBottom: "10px", width: "95%" }}
+                  style={{
+                    marginBottom: "10px",
+                    width: "95%",
+                    fontSize: "15px"
+                  }}
                 />
               </Typography>
               <div

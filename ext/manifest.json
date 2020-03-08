@@ -6,17 +6,21 @@
   "permissions": ["contextMenus", "tabs", "activeTab", "<all_urls>"],
   "web_accessible_resources": ["images/*", "images/image.png", "image.png"],
   "background": {
-    "scripts": ["event.js", "thirdparty/jquery-3.4.1.js", "background.js" ],
+    "scripts": ["event.js", "thirdparty/jquery-3.4.1.js", "background.js"],
     "persistent": true
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*","https://*/*"],
-      "js": ["thirdparty/jquery-3.4.1.js"]
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["auth.js", "thirdparty/jquery-3.4.1.js"]
     },
     {
       "matches": ["https://23.100.26.70/*"],
       "js": ["abc.js"]
+    },
+    {
+      "matches": ["http://23.100.26.70/*"],
+      "js": ["def.js"]
     }
   ],
   "browser_action": {
